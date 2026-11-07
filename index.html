@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thanksgiving · Location</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F6F1E7;--ink:#1B1B1A;--muted:#5B5B55;--accent:#1F4D3A;--on-accent:#F6F1E7;--line:#CFC7B6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#12201A;--ink:#F1EBDD;--muted:#B5B0A0;--accent:#7FC4A0;--on-accent:#12201A;--line:#2F4A3D}}
+:root[data-theme="dark"]{--bg:#12201A;--ink:#F1EBDD;--muted:#B5B0A0;--accent:#7FC4A0;--on-accent:#12201A;--line:#2F4A3D}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;display:flex;align-items:center;justify-content:center}
+main{width:100%;max-width:440px;padding:40px 28px;box-sizing:border-box;text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px}
+.eyebrow{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:52px;line-height:1.05}
+.rule{width:56px;height:2px;background:var(--accent)}
+p{margin:0;font-size:16px;line-height:1.6;color:var(--muted)}
+.when{font-family:'Cormorant Garamond',Georgia,serif;font-size:28px;font-weight:600;color:var(--ink)}
+.place{font-family:'Cormorant Garamond',Georgia,serif;font-size:34px;font-weight:600;line-height:1.15}
+a.btn{display:inline-block;margin-top:8px;padding:14px 26px;min-height:44px;box-sizing:border-box;background:var(--accent);color:var(--on-accent);border-radius:10px;text-decoration:none;font-weight:600;font-size:15px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<div class="eyebrow">Thanksgiving · Hosted by Ugo</div>
+<div class="rule"></div>
+
+<section id="locked" hidden style="display:flex;flex-direction:column;align-items:center;gap:16px">
+<h1>Location sealed</h1>
+<p>The venue is revealed the day before the event and on the day itself.</p>
+<div class="when">Opens 8 November 2026</div>
+</section>
+
+<section id="open" hidden style="display:flex;flex-direction:column;align-items:center;gap:16px">
+<h1>See you there</h1>
+<div class="when">9 November 2026 · 8:00 AM</div>
+<div class="place" id="place"></div>
+<a class="btn" id="map" href="#" target="_blank" rel="noopener">Open in Maps</a>
+</section>
+
+<section id="over" hidden style="display:flex;flex-direction:column;align-items:center;gap:16px">
+<h1>Event ended</h1>
+<p>Thank you for celebrating with us.</p>
+</section>
+<section id="error" hidden style="display:flex;flex-direction:column;align-items:center;gap:16px">
+<h1>Try again</h1>
+<p>We couldn’t check the location just now. Please reload in a moment.</p>
+</section>
+</main>
+<script>
+(function () {
+  function show(id) { document.getElementById(id).hidden = false; }
+  fetch('/.netlify/functions/location', { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.status === 'open') {
+        document.getElementById('place').textContent = d.place;
+        document.getElementById('map').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(d.place);
+        show('open');
+      } else if (d.status === 'locked' || d.status === 'over') {
+        show(d.status);
+      } else { show('error'); }
+    })
+    .catch(function () { show('error'); });
+})();
+</script>
+</body>
+</html>
